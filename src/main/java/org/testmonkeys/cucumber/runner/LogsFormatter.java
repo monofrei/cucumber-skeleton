@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import static org.testmonkeys.cucumber.runner.Status.*;
 
@@ -20,10 +21,11 @@ public class LogsFormatter implements Formatter, Reporter {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private Feature currentFeature;
     private String featureUri;
-    private Scenario currentScenario;
-    private ScenarioOutline currentScenarioOutline;
     private String currentStep;
     private Status testStatus;
+    private Result failedResult;
+    private long scenarioDuration;
+    private long stepStarted;
 
     @Override
     public void syntaxError(String s, String s1, List<String> list, String s2, Integer integer) {
@@ -46,7 +48,6 @@ public class LogsFormatter implements Formatter, Reporter {
 
     @Override
     public void scenarioOutline(ScenarioOutline scenarioOutline) {
-        currentScenarioOutline = scenarioOutline;
         logger.info("[EXECUTING SCENARIO OUTLINE]:" + scenarioOutline.getName());
     }
 
@@ -67,7 +68,6 @@ public class LogsFormatter implements Formatter, Reporter {
 
     @Override
     public void startOfScenarioLifeCycle(Scenario scenario) {
-        currentScenario = scenario;
         String name = scenario.getName();
         int line = scenario.getLine();
         TestLogHelper.stopTestLogging();
@@ -75,12 +75,11 @@ public class LogsFormatter implements Formatter, Reporter {
 
         TestLogHelper.startTestLogging(format.format(new Date().getTime()) + "_" + name + "_" + line);
         logger.info("[TEST STARTED]: " + name + " at line[" + line + "]");
-        logger.info(System.lineSeparator());
     }
 
     @Override
     public void background(Background background) {
-        logger.info("[BACKGROUND]:" + background.getName());
+        logger.info("[BACKGROUND]:" + background.getName() + System.lineSeparator());
     }
 
     @Override
@@ -95,10 +94,15 @@ public class LogsFormatter implements Formatter, Reporter {
 
     @Override
     public void endOfScenarioLifeCycle(Scenario scenario) {
+        if (failedResult != null)
+            logger.error("[TEST " + testStatus + "][" + scenarioDuration + "]:" + scenario.getName(), failedResult.getError());
+        else
+            logger.info("[TEST " + testStatus + "][" + scenarioDuration + "]:" + scenario.getName() + System.lineSeparator());
+
+        scenarioDuration = 0;
         currentStep = null;
-        currentScenario = null;
-        logger.info("[TEST " + testStatus + "]:" + scenario.getName());
-        //TODO add test duration
+        failedResult = null;
+
     }
 
     @Override
@@ -119,24 +123,25 @@ public class LogsFormatter implements Formatter, Reporter {
     @Override
     public void before(Match match, Result result) {
         Status status = Status.valueOf(result.getStatus().toUpperCase());
+        Long duration = TimeUnit.MILLISECONDS.toSeconds(result.getDuration());
         if (status.equals(FAILED))
-            logger.error("[BEFORE HOOK FAILED]:" + match.getLocation(), result.getError());
+            logger.error("[BEFORE HOOK FAILED][" + duration + "]:" + match.getLocation(), result.getError());
         else
-            logger.info("[BEFORE HOOK " + status + "]:" + match.getLocation());
+            logger.info("[BEFORE HOOK " + status + "][" + duration + "]:" + match.getLocation());
     }
 
     @Override
     public void result(Result result) {
         Status status = Status.valueOf(result.getStatus().toUpperCase());
-        if (status.equals(FAILED))
-            logger.error("[STEP FAILED]:" + currentStep, result.getError());
-        else
-            logger.info("[STEP " + result.getStatus().toUpperCase() + "]:" + currentStep);
+        long duration = calculateDuration(stepStarted, System.currentTimeMillis(), TimeUnit.SECONDS);
+        if (status.equals(FAILED)) {
+            failedResult = result;
+            logger.error("[STEP FAILED][" + duration + "]:" + currentStep, result.getError());
+        } else
+            logger.info("[STEP " + result.getStatus().toUpperCase() + "][" + duration + "]:" + currentStep + System.lineSeparator());
 
         applyTestStatus(Status.valueOf(result.getStatus().toUpperCase()));
-        //TODO log error in case fail
-        //TODO add duration
-
+        scenarioDuration += duration;
     }
 
     private void applyTestStatus(Status newStatus) {
@@ -159,6 +164,7 @@ public class LogsFormatter implements Formatter, Reporter {
         if (match instanceof StepDefinitionMatch) {
             currentStep = ((StepDefinitionMatch) match).getStepLocation().getMethodName();
             logger.info("[STEP STARTED]:" + currentStep);
+            stepStarted = System.currentTimeMillis();
         }
     }
 
@@ -170,5 +176,10 @@ public class LogsFormatter implements Formatter, Reporter {
     @Override
     public void write(String text) {
 
+    }
+
+    private long calculateDuration(long started, long finished, TimeUnit outputUnit) {
+        long duration = finished - started;
+        return outputUnit.convert(duration, TimeUnit.MILLISECONDS);
     }
 }

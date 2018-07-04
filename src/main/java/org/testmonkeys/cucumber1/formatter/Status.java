@@ -1,4 +1,4 @@
-package org.testmonkeys.cucumber.runner;
+package org.testmonkeys.cucumber1.formatter;
 
 public enum Status {
     IGNORED,

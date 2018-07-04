@@ -1,16 +1,6 @@
 Feature: Feature Sample
 
-  Background:Background bbb
-    Given this is a sample given step
-    When this is a sample when step
-
-
-  Scenario: Sample Scenario1
-    Given this is a sample given step
-    When this is a sample when step
-    Then this is a sample then step
-
-
+  @tag1 @tag3
   Scenario Outline: Sample Scenario2
     Given this is a sample '<column1>' step
     When this is a sample '<column2>' step

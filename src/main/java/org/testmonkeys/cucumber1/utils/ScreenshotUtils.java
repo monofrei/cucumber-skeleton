@@ -1,10 +1,10 @@
-package org.testmonkeys.cucumber.utils;
+package org.testmonkeys.cucumber1.utils;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.testmonkeys.cucumber.appender.CukeScenarioContext;
-import org.testmonkeys.cucumber.runner.TestLogHelper;
+import org.testmonkeys.cucumber1.appender.CucumberScenarioContext;
+import org.testmonkeys.cucumber1.formatter.TestLogHelper;
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.Screenshot;
 import ru.yandex.qatools.ashot.screentaker.ViewportPastingStrategy;
@@ -35,6 +35,10 @@ public class ScreenshotUtils {
         ((JavascriptExecutor) driver).executeScript("arguments[0].style.removeProperty('border')", new WebElement[]{element});
     }
 
+    public static void makeScreenShot(WebDriver driver) throws IOException {
+        makeScreenShot(driver,null,null);
+    }
+
     public static void makeScreenShot(WebDriver driver, String directory, String filename) throws IOException {
         updateScreenshotIndexIfNewTest();
 
@@ -53,8 +57,10 @@ public class ScreenshotUtils {
         array.flush();
         imageBytes = array.toByteArray();
 
-        CukeScenarioContext.getInstance().attachScreenshot(imageBytes);
+        CucumberScenarioContext.getInstance().attachScreenshot(imageBytes);
 
+        if (directory == null) return;
+        if (filename == null) filename = "screenshot_" + System.currentTimeMillis();
         Files.createDirectories(Paths.get(directory));
         File file = new File(directory + String.format("%03d", screenshotIndex++) + filename + imageFileExtension);
 

@@ -40,8 +40,8 @@
         </sift>
     </appender>
 
-    <appender name="CukeOut" class="org.testmonkeys.cucumber.appender.CukeAppender">
-        <filter class="org.testmonkeys.cucumber.appender.CukeAppenderFilter"/>
+    <appender name="CukeOut" class="org.testmonkeys.cucumber1.appender.CucumberAppender">
+        <filter class="org.testmonkeys.cucumber1.appender.CucumberAppenderFilter"/>
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{20} - %msg %n</pattern>
         </layout>

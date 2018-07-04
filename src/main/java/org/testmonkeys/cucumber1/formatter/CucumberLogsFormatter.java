@@ -1,4 +1,4 @@
-package org.testmonkeys.cucumber.runner;
+package org.testmonkeys.cucumber1.formatter;
 
 
 import cucumber.runtime.StepDefinitionMatch;
@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static org.testmonkeys.cucumber.runner.Status.*;
+import static org.testmonkeys.cucumber1.formatter.Status.*;
 
-public class LogsFormatter implements Formatter, Reporter {
+public class CucumberLogsFormatter implements Formatter, Reporter {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private Feature currentFeature;

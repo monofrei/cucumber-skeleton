@@ -1,4 +1,4 @@
-package org.testmonkeys.cucumber.runner;
+package org.testmonkeys.cucumber1.formatter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,19 +1,19 @@
-package org.testmonkeys.cucumber.appender;
+package org.testmonkeys.cucumber1.appender;
 
 import cucumber.api.Scenario;
 
-public class CukeScenarioContext {
+public class CucumberScenarioContext {
 
-    private static CukeScenarioContext instance;
+    private static CucumberScenarioContext instance;
     private Scenario scenario;
 
-    private CukeScenarioContext() {
+    private CucumberScenarioContext() {
 
     }
 
-    public static synchronized CukeScenarioContext getInstance() {
+    public static synchronized CucumberScenarioContext getInstance() {
         if (instance == null)
-            instance = new CukeScenarioContext();
+            instance = new CucumberScenarioContext();
 
         return instance;
     }

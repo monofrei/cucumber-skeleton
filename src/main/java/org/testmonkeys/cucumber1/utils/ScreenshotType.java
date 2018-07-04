@@ -1,4 +1,4 @@
-package org.testmonkeys.cucumber.utils;
+package org.testmonkeys.cucumber1.utils;
 
 public enum ScreenshotType {
     FULL,

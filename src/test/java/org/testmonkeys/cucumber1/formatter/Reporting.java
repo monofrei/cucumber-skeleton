@@ -1,4 +1,4 @@
-package org.testmonkeys.cucumber.runner;
+package org.testmonkeys.cucumber1.formatter;
 
 import net.masterthought.cucumber.Configuration;
 import net.masterthought.cucumber.ReportBuilder;
